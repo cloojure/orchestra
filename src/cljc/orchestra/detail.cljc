@@ -1,7 +1,8 @@
 (ns orchestra.detail
-  (:require [#?(:clj clojure.spec.alpha
-                :cljs cljs.spec.alpha)
-             :as s]))
+  (:require
+    [#?(:clj  clojure.spec.alpha
+        :cljs cljs.spec.alpha) :as s]
+    [orchestra.spec.test :as ost]))
 
 ;;;; destructure
 
@@ -176,8 +177,8 @@
                        {:args args-spec})}))
 
 (defn defn-spec-helper [& args]
-  (let [s-fdef (spec-fn ::fdef)
-        exploded (apply explode-def args)
+  (let [s-fdef        (spec-fn ::fdef)
+        exploded      (apply explode-def args)
         stripped-meta (dissoc (:meta exploded) :fn)]
     `(do
        (defn ~(::name exploded)
@@ -185,6 +186,7 @@
          ~(or stripped-meta {})
          ~@(::arities exploded))
        (~s-fdef ~(::name exploded)
-                :args ~(-> exploded ::spec-map :args)
-                :fn ~(-> exploded ::spec-map :fn)
-                :ret ~(-> exploded ::spec-map :ret)))))
+         :args ~(-> exploded ::spec-map :args)
+         :fn ~(-> exploded ::spec-map :fn)
+         :ret ~(-> exploded ::spec-map :ret))
+       (ost/instrument))))
